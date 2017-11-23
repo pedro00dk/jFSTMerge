@@ -1,0 +1,198 @@
+
+options {
+    UNICODE_INPUT = true;
+    // JAVA_UNICODE_ESCAPE = true;
+    ERROR_REPORTING = true;
+    STATIC = false;
+}
+
+PARSER_BEGIN(Html5MergeParser)
+
+package de.ovgu.cide.fstgen.parsers.generated_html5_merge;
+
+import java.io.*;
+import java.util.*;
+import cide.gast.*;
+import cide.gparser.*;
+import de.ovgu.cide.fstgen.ast.*;
+
+public class Html5MergeParser extends AbstractFSTParser {
+    public Html5MergeParser() {}
+}
+
+PARSER_END(Html5MergeParser)
+
+
+
+
+TOKEN: {
+<   WS: " " | "\t" | "\r" | "\n" | "\r\n"                                                           >
+}
+
+//-- Special Modes --//
+
+TOKEN [IGNORE_CASE]: {
+<   COMMENT_TO  : "<!--"                                                                            > : IN_COMMENT |
+<   CDATA_TO    : "<![CDATA["                                                                       > : IN_CDATA |
+<   DTD_TO      : "<!"                                                                              > : IN_DTD |
+<   XML_TO      : "<?xml"                                                                           > : IN_XML |
+<   SC_LET1_TO  : "<?"                                                                              > : IN_SC_LET1 |
+<   SC_LET2_TO  : "<%"                                                                              > : IN_SC_LET2 |
+<   SCRIPT_TO   : "<script>"                                                                        > : IN_SCRIPT |
+<   STYLE_TO    : "<style>"                                                                         > : IN_STYLE |
+<   TO          : "<"                                                                               > : IN_TAG
+}
+
+<IN_COMMENT>
+TOKEN: {
+<   COMMENT_TC  : "-->"                                                                             > : DEFAULT |
+<   COMMENT     : ((~["-"]) | ("-" ~["-"]) | ("--" ~[">"]))+                                        >
+}
+
+<IN_CDATA>
+TOKEN: {
+<   CDATA_TC    : "]]>"                                                                             > : DEFAULT |
+<   CDATA       : ((~["]"]) | ("]" ~["]"]) | ("]]" ~[">"]))+                                        >
+}
+
+<IN_DTD>
+TOKEN: {
+<   DTD_TC      : ">"                                                                               > : DEFAULT |
+<   DTD         : (~[">"])+                                                                         >
+}
+
+<IN_XML>
+TOKEN: {
+<   XML_TC      : ">"                                                                               > : DEFAULT |
+<   XML         : (~[">"])+                                                                         >
+}
+
+<IN_SC_LET1>
+TOKEN: {
+<   SC_LET1_TC  : "?>"                                                                              > : DEFAULT |
+<   SC_LET1     : ((~["?"]) | ("?" ~[">"]))+                                                        >
+}
+
+<IN_SC_LET2>
+TOKEN: {
+<   SC_LET2_TC  : "%>"                                                                              > : DEFAULT |
+<   SC_LET2     : ((~["%"]) | ("%" ~[">"]))+                                                        >
+}
+
+<IN_SCRIPT>
+TOKEN [IGNORE_CASE]: {
+<   SCRIPT_TC   : "</script>"                                                                       > : DEFAULT |
+<   SCRIPT      : ((~["<"]) | ("<" ~["/"]))+                                                        >
+}
+
+<IN_STYLE>
+TOKEN [IGNORE_CASE]: {
+<   STYLE_TC    : "</style>"                                                                        > : DEFAULT |
+<   STYLE       : ((~["<"]) | ("<" ~["/"]))+                                                        >
+}
+
+//-- Generic tag blocks --//
+
+<IN_TAG>
+SKIP: {
+<   " " | "\t" | "\r" | "\n" | "\r\n"                                                               >
+}
+
+<IN_TAG>
+TOKEN: {
+<   TC          : ">"                                                                               > : DEFAULT |
+<   TS          : "/"                                                                               > |
+<   E_ID        : ("area" | "base" | "br" | "col" | "hr" | "img" | "input" | "link" | "meta" | "param" | "command" | "keygen" | "source") > |
+<   ID          : <ID_FIRST> (<ID_REST>)*                                                           > |
+<   #ID_FIRST   : ["A"-"Z", "a"-"z", "\u2070"-"\u218F", "\u2C00"-"\u2FEF", "\u3001"-"\uD7FF", "\uF900"-"\uFDCF", "\uFDF0"-"\uFFFD"] > |
+<   #ID_REST    :  <ID_FIRST> | ["0"-"9", "-", "_", ".", "\u00B7", "\u0300"-"\u036F", "\u203F"-"\u2040"] > |
+<   ASSIGN      : "="                                                                               > : IN_ATTR
+}
+
+//-- Attributes --//
+
+<IN_ATTR>
+TOKEN: {
+<   ATTR_VALUE  : (" ")* (<DQ_STRING> | <SQ_STRING> | <CHARS> | <HEXCHARS> | <DECCHARS>)            > : IN_TAG |
+<   #DQ_STRING  : "\"" ((~["\""]) | ("\\\""))* "\""                                                 > |
+<   #SQ_STRING  : "'" (~["'"])* "'"                                                     > |
+<   #CHARS      : (["0"-"9", "A"-"Z", "a"-"z", "-" , "_" , "." , "/" , "+" , "," , "?" , "=" , ":" , ";" , "#"])+ (" ")?> |
+<   #HEXCHARS   : "#" (["0"-"9", "A"-"F", "a"-"f"])+                                                > |
+<   #DECCHARS   : (["0"-"9"])+ ("%")?                                                               >
+}
+
+TOKEN: {
+<   TEXT        : (~["<"])+                                                                         >
+}
+
+GRAMMARSTART
+
+@FSTNonTerminal()
+Document:
+    (Element)*
+;
+
+@FSTNonTerminal()
+Element:
+    TagBlock |
+    Comment |
+    Cdata |
+    Dtd |
+    Xml |
+    Sc_let1 |
+    Sc_let2 |
+    Script |
+    Style |
+    CharData
+;
+
+@FSTNonTerminal()
+TagBlock:
+    LL(2147483647) <TO> <ID> (Attribute)* <TC> (LL(2) Element)* <TO> <TS> <ID> <TC> |
+    LL(2147483647) <TO> <ID> (Attribute)* <TS> <TC> |
+    LL(2147483647) <TO> <E_ID> (Attribute)* <TS> <TC> |
+    LL(2147483647) <TO> <E_ID> (Attribute)* <TC>
+;
+
+CharData:
+    (LL(2) Text)+
+;
+
+Text:
+    <TEXT> |
+    <WS>
+;
+
+@FSTNonTerminal(name="{TOSTRING}")
+Comment:
+    <COMMENT_TO> (<COMMENT>)? <COMMENT_TC>
+;
+Cdata:
+    <CDATA_TO> (<CDATA>)? <CDATA_TC>
+;
+Dtd:
+    <DTD_TO> (<DTD>)? <DTD_TC>
+;
+Xml:
+    <XML_TO> (<XML>)? <XML_TC>
+;
+Sc_let:
+    Sc_let1 | Sc_let2
+;
+Sc_let1:
+    <SC_LET1_TO> (<SC_LET1>)? <SC_LET1_TC>
+;
+Sc_let2:
+    <SC_LET2_TO> (<SC_LET2>)? <SC_LET2_TC>
+;
+Script:
+    <SCRIPT_TO> (<SCRIPT>)? <SCRIPT_TC>
+;
+Style:
+    <STYLE_TO> (<STYLE>)? <STYLE_TC>
+;
+
+Attribute:
+    LL(2) <ID> <ASSIGN> <ATTR_VALUE> |
+    LL(2) <ID>
+;
