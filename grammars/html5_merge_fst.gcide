@@ -257,10 +257,10 @@ AttributeList:
 Attribute:
 
     @FSTNonTerminal(name="{Id}")
-    LL(2) Id Assign AttrValue |
+    LL(2) @~ Id Assign AttrValue |
 
     @FSTNonTerminal(name="{Id}")
-    LL(2) Id
+    LL(2) @~ Id
 ;
 
 @FSTTerminal(name="{TOSTRING}", merge="LineBased")

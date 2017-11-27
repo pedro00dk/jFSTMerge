@@ -351,6 +351,7 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 		}
 		if (nonTerminal.getType().equals("Attribute1")) {
 			printFeatures(nonTerminal,true);
+			hintSingleSpace();
 			{
 				FSTNode v=getChild(nonTerminal, "Id");
 				if (v!=null) {
@@ -374,6 +375,7 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 		}
 		if (nonTerminal.getType().equals("Attribute2")) {
 			printFeatures(nonTerminal,true);
+			hintSingleSpace();
 			{
 				FSTNode v=getChild(nonTerminal, "Id");
 				if (v!=null) {
