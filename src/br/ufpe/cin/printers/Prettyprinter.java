@@ -31,7 +31,8 @@ public final class Prettyprinter {
 
 		String printable = "";
 		//de.ovgu.cide.fstgen.parsers.generated_java18_merge.SimplePrintVisitor printer = new de.ovgu.cide.fstgen.parsers.generated_java18_merge.SimplePrintVisitor();
-		SimplePrintVisitor printer = new SimplePrintVisitor();
+		SimplePrintVisitor printer = new SimplePrintVisitor(System.out);
+		printer.generateSpaces = false;
 		FSTNode root = getCompilationUnit(tree);
 		if(root != null){
 			root.accept(printer);

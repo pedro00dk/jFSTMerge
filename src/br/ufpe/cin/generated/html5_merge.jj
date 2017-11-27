@@ -1,0 +1,354 @@
+
+options {
+    UNICODE_INPUT = true;
+    // JAVA_UNICODE_ESCAPE = true;
+    ERROR_REPORTING = true;
+    STATIC = false;
+}
+
+PARSER_BEGIN(Html5MergeParser)
+
+package de.ovgu.cide.fstgen.parsers.generated_html5_merge;
+
+import java.io.*;
+import java.util.*;
+import cide.gast.*;
+import cide.gparser.*;
+import de.ovgu.cide.fstgen.ast.*;
+
+public class Html5MergeParser extends AbstractFSTParser {
+    public Html5MergeParser() {}
+}
+
+PARSER_END(Html5MergeParser)
+
+
+
+
+TOKEN: {
+<   WS: " " | "\t" | "\r" | "\n" | "\r\n"                                                           >
+}
+
+//-- Special Modes --//
+
+TOKEN [IGNORE_CASE]: {
+<   COMMENT_TO  : "<!--"                                                                            > : IN_COMMENT |
+<   CDATA_TO    : "<![CDATA["                                                                       > : IN_CDATA |
+<   DTD_TO      : "<!"                                                                              > : IN_DTD |
+<   XML_TO      : "<?xml"                                                                           > : IN_XML |
+<   SC_LET1_TO  : "<?"                                                                              > : IN_SC_LET1 |
+<   SC_LET2_TO  : "<%"                                                                              > : IN_SC_LET2 |
+<   SCRIPT_TO   : "<script>"                                                                        > : IN_SCRIPT |
+<   STYLE_TO    : "<style>"                                                                         > : IN_STYLE |
+<   TO          : "<"                                                                               > : IN_TAG
+}
+
+<IN_COMMENT>
+TOKEN: {
+<   COMMENT_TC  : "-->"                                                                             > : DEFAULT |
+<   COMMENT     : ((~["-"]) | ("-" ~["-"]) | ("--" ~[">"]))+                                        >
+}
+
+<IN_CDATA>
+TOKEN: {
+<   CDATA_TC    : "]]>"                                                                             > : DEFAULT |
+<   CDATA       : ((~["]"]) | ("]" ~["]"]) | ("]]" ~[">"]))+                                        >
+}
+
+<IN_DTD>
+TOKEN: {
+<   DTD_TC      : ">"                                                                               > : DEFAULT |
+<   DTD         : (~[">"])+                                                                         >
+}
+
+<IN_XML>
+TOKEN: {
+<   XML_TC      : ">"                                                                               > : DEFAULT |
+<   XML         : (~[">"])+                                                                         >
+}
+
+<IN_SC_LET1>
+TOKEN: {
+<   SC_LET1_TC  : "?>"                                                                              > : DEFAULT |
+<   SC_LET1     : ((~["?"]) | ("?" ~[">"]))+                                                        >
+}
+
+<IN_SC_LET2>
+TOKEN: {
+<   SC_LET2_TC  : "%>"                                                                              > : DEFAULT |
+<   SC_LET2     : ((~["%"]) | ("%" ~[">"]))+                                                        >
+}
+
+<IN_SCRIPT>
+TOKEN [IGNORE_CASE]: {
+<   SCRIPT_TC   : "</script>"                                                                       > : DEFAULT |
+<   SCRIPT      : ((~["<"]) | ("<" ~["/"]))+                                                        >
+}
+
+<IN_STYLE>
+TOKEN [IGNORE_CASE]: {
+<   STYLE_TC    : "</style>"                                                                        > : DEFAULT |
+<   STYLE       : ((~["<"]) | ("<" ~["/"]))+                                                        >
+}
+
+//-- Generic tag blocks --//
+
+<IN_TAG>
+SKIP: {
+<   " " | "\t" | "\r" | "\n" | "\r\n"                                                               >
+}
+
+<IN_TAG>
+TOKEN: {
+<   TC          : ">"                                                                               > : DEFAULT |
+<   TS          : "/"                                                                               > |
+<   E_ID        : ("area" | "base" | "br" | "col" | "hr" | "img" | "input" | "link" | "meta" | "param" | "command" | "keygen" | "source") > |
+<   ID          : <ID_FIRST> (<ID_REST>)*                                                           > |
+<   #ID_FIRST   : ["A"-"Z", "a"-"z", "\u2070"-"\u218F", "\u2C00"-"\u2FEF", "\u3001"-"\uD7FF", "\uF900"-"\uFDCF", "\uFDF0"-"\uFFFD"] > |
+<   #ID_REST    :  <ID_FIRST> | ["0"-"9", "-", "_", ".", "\u00B7", "\u0300"-"\u036F", "\u203F"-"\u2040"] > |
+<   ASSIGN      : "="                                                                               > : IN_ATTR
+}
+
+//-- Attributes --//
+
+<IN_ATTR>
+TOKEN: {
+<   ATTR_VALUE  : (" ")* (<DQ_STRING> | <SQ_STRING> | <CHARS> | <HEXCHARS> | <DECCHARS>)            > : IN_TAG |
+<   #DQ_STRING  : "\"" ((~["\""]) | ("\\\""))* "\""                                                 > |
+<   #SQ_STRING  : "'" (~["'"])* "'"                                                     > |
+<   #CHARS      : (["0"-"9", "A"-"Z", "a"-"z", "-" , "_" , "." , "/" , "+" , "," , "?" , "=" , ":" , ";" , "#"])+ (" ")?> |
+<   #HEXCHARS   : "#" (["0"-"9", "A"-"F", "a"-"f"])+                                                > |
+<   #DECCHARS   : (["0"-"9"])+ ("%")?                                                               >
+}
+
+TOKEN: {
+<   TEXT        : (~["<"])+                                                                         >
+}
+FSTInfo CompilationUnit(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	(n=Element(inTerminal){ replaceName(n);})* {return productionEndNonTerminal("CompilationUnit","-","-");}
+
+ )  }
+
+FSTInfo Element(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=TagBlock(inTerminal){ replaceName(n);} {return productionEndNonTerminal("Element1","-","-");}
+ |
+	n=Comment(inTerminal){ replaceName("Comment", n);}{ replaceName(n);} {return productionEndNonTerminal("Element2","{Comment}","{Comment}");}
+ |
+	n=Cdata(inTerminal){ replaceName("Cdata", n);}{ replaceName(n);} {return productionEndNonTerminal("Element3","{Cdata}","{Cdata}");}
+ |
+	n=Dtd(inTerminal){ replaceName("Dtd", n);}{ replaceName(n);} {return productionEndNonTerminal("Element4","{Dtd}","{Dtd}");}
+ |
+	n=Xml(inTerminal){ replaceName("Xml", n);}{ replaceName(n);} {return productionEndNonTerminal("Element5","{Xml}","{Xml}");}
+ |
+	n=Sclet(inTerminal){ replaceName("Sclet", n);}{ replaceName(n);} {return productionEndNonTerminal("Element6","{Sclet}","{Sclet}");}
+ |
+	n=CharData(inTerminal){ replaceName("CharData", n);}{ replaceName(n);} {return productionEndNonTerminal("Element7","{CharData}","{CharData}");}
+
+ )  }
+
+FSTInfo TagBlock(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	LOOKAHEAD(2147483647) n=TagOpen(inTerminal){ replaceName("TagOpen", n);}{ replaceName(n);} (LOOKAHEAD(2) n=Element(inTerminal){ replaceName(n);})* n=TagClose(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagBlock1","{TagOpen}","{TagOpen}");}
+ |
+	LOOKAHEAD(2147483647) n=TagOpenClose(inTerminal){ replaceName("TagOpenClose", n);}{ replaceName(n);} {return productionEndNonTerminal("TagBlock2","{TagOpenClose}","{TagOpenClose}");}
+ |
+	LOOKAHEAD(2147483647) n=EmptyTag(inTerminal){ replaceName("EmptyTag", n);}{ replaceName(n);} {return productionEndNonTerminal("TagBlock3","{EmptyTag}","{EmptyTag}");}
+ |
+	LOOKAHEAD(2147483647) n=EmptyCloseTag(inTerminal){ replaceName("EmptyCloseTag", n);}{ replaceName(n);} {return productionEndNonTerminal("TagBlock4","{EmptyCloseTag}","{EmptyCloseTag}");}
+
+ )  }
+
+FSTInfo TagOpen(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=To(inTerminal){ replaceName(n);} n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName("AttributeList", n);}{ replaceName(n);}] n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagOpen","tag->{Id}{AttributeList}","tag->{Id}{AttributeList}");}
+
+ )  }
+
+FSTInfo TagClose(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=To(true){ replaceName(n);} n=Ts(true){ replaceName(n);} n=Id(true){ replaceName(n);} n=Tc(true){ replaceName(n);} {return productionEndTerminal("TagClose","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo TagOpenClose(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=To(inTerminal){ replaceName(n);} n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName("AttributeList", n);}{ replaceName(n);}] n=Ts(inTerminal){ replaceName(n);} n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagOpenClose","ctag->{Id}{AttributeList}","ctag->{Id}{AttributeList}");}
+
+ )  }
+
+FSTInfo EmptyTag(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=To(inTerminal){ replaceName(n);} n=EId(inTerminal){ replaceName("EId", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName(n);}] n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("EmptyTag","etag->{EId}","etag->{EId}");}
+
+ )  }
+
+FSTInfo EmptyCloseTag(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=To(inTerminal){ replaceName(n);} n=EId(inTerminal){ replaceName("EId", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName("AttributeList", n);}{ replaceName(n);}] n=Ts(inTerminal){ replaceName(n);} n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("EmptyCloseTag","ectag->{EId}{AttributeList}","ectag->{EId}{AttributeList}");}
+
+ )  }
+
+FSTInfo Comment(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<COMMENT_TO> [<COMMENT>] <COMMENT_TC> {return productionEndTerminal("Comment","-","{TOSTRING}","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Cdata(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<CDATA_TO> [<CDATA>] <CDATA_TC> {return productionEndTerminal("Cdata","-","{TOSTRING}","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Dtd(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<DTD_TO> [<DTD>] <DTD_TC> {return productionEndTerminal("Dtd","-","{TOSTRING}","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Xml(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<XML_TO> [<XML>] <XML_TC> {return productionEndTerminal("Xml","-","{TOSTRING}","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Sclet(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=Sclet1(true){ replaceName(n);} {return productionEndTerminal("Sclet1","-","{TOSTRING}","Replacement","Default",first,token);}
+ |
+	n=Sclet2(true){ replaceName(n);} {return productionEndTerminal("Sclet2","-","{TOSTRING}","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Sclet1(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<SC_LET1_TO> [<SC_LET1>] <SC_LET1_TC> {return productionEndTerminal("Sclet1","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Sclet2(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<SC_LET2_TO> [<SC_LET2>] <SC_LET2_TC> {return productionEndTerminal("Sclet2","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo CharData(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	(LOOKAHEAD(2) n=Text(true){ replaceName(n);})+ {return productionEndTerminal("CharData","-","ws->{AUTO}","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Text(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<TEXT> {return productionEndTerminal("Text1","-","-","Replacement","LineBased",first,token);}
+ |
+	<WS> {return productionEndTerminal("Text2","-","-","Replacement","LineBased",first,token);}
+
+ )  }
+
+FSTInfo Script(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=ScriptTo(inTerminal){ replaceName(n);} [n=AttributeList(inTerminal){ replaceName(n);}] [n=ScriptContent(inTerminal){ replaceName(n);}] n=ScriptTc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("Script","script->{AUTO}","script->{AUTO}");}
+
+ )  }
+
+FSTInfo Style(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	n=StyleTo(inTerminal){ replaceName(n);} [n=AttributeList(inTerminal){ replaceName(n);}] [n=StyleConent(inTerminal){ replaceName(n);}] n=StyleTc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("Style","style->{AUTO}","style->{AUTO}");}
+
+ )  }
+
+FSTInfo AttributeList(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	(n=Attribute(inTerminal){ replaceName(n);})+ {return productionEndNonTerminal("AttributeList","-","-");}
+
+ )  }
+
+FSTInfo Attribute(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	LOOKAHEAD(2) n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} n=Assign(inTerminal){ replaceName(n);} n=AttrValue(inTerminal){ replaceName(n);} {return productionEndNonTerminal("Attribute1","{Id}","{Id}");}
+ |
+	LOOKAHEAD(2) n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} {return productionEndNonTerminal("Attribute2","{Id}","{Id}");}
+
+ )  }
+
+FSTInfo Id(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<ID> {return productionEndTerminal("Id","{TOSTRING}","{TOSTRING}","Replacement","LineBased",first,token);}
+
+ )  }
+
+FSTInfo EId(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<E_ID> {return productionEndTerminal("EId","{TOSTRING}","{TOSTRING}","Replacement","LineBased",first,token);}
+
+ )  }
+
+FSTInfo AttrValue(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<ATTR_VALUE> {return productionEndTerminal("AttrValue","-","-","Replacement","LineBased",first,token);}
+
+ )  }
+
+FSTInfo Assign(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<ASSIGN> {return productionEndTerminal("Assign","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo To(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<TO> {return productionEndTerminal("To","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Tc(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<TC> {return productionEndTerminal("Tc","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo Ts(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<TS> {return productionEndTerminal("Ts","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo ScriptTo(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<SCRIPT_TO> {return productionEndTerminal("ScriptTo","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo ScriptTc(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<SCRIPT_TC> {return productionEndTerminal("ScriptTc","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo ScriptContent(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<SCRIPT> {return productionEndTerminal("ScriptContent","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo StyleTo(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<STYLE_TO> {return productionEndTerminal("StyleTo","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo StyleTc(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<STYLE_TC> {return productionEndTerminal("StyleTc","-","-","Replacement","Default",first,token);}
+
+ )  }
+
+FSTInfo StyleConent(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
+} { {first=getToken(1); productionStart(inTerminal); } (
+	<STYLE> {return productionEndTerminal("StyleConent","-","-","Replacement","Default",first,token);}
+
+ )  }
+

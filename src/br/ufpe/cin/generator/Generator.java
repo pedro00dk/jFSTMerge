@@ -28,7 +28,7 @@ public class Generator {
 			//3. test the generated artefacts
 			new GeneratedParserTest().test(
 					"br.ufpe.cin.generated.Html5MergeParser", 
-					"Document",
+					"CompilationUnit",
 					"grammars/html5_merge_fst_test.html"
 					);
 		

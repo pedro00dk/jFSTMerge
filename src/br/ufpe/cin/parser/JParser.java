@@ -8,7 +8,7 @@ import java.io.UnsupportedEncodingException;
 
 import br.ufpe.cin.app.JFSTMerge;
 import br.ufpe.cin.files.FilesManager;
-import br.ufpe.cin.generated.Java18MergeParser;
+import br.ufpe.cin.generated.Html5MergeParser;
 import cide.gparser.OffsetCharStream;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
@@ -18,8 +18,8 @@ import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 
 /**
  * Class responsible for parsing java files, based on a 
- * <i>featurebnf</i> Java 1.8 annotated grammar: 
- * {@link http://tinyurl.com/java18featurebnf}
+ * <i>featurebnf</i> Java 1.8 annotated grammar
+ *
  * For more information, see the documents in <i>guides</i> package.
  * @author Guilherme
  */
@@ -35,11 +35,11 @@ public class JParser {
 	 */
 	public FSTNode parse(File javaFile) throws FileNotFoundException, UnsupportedEncodingException, ParseException, TokenMgrError  {
 		FSTFeatureNode generatedAst = new FSTFeatureNode("");//root node
-		if(isValidFile(javaFile)){
+		if(isValidHtmlFile(javaFile)){
 			if(!JFSTMerge.isGit){
 				System.out.println("Parsing: " + javaFile.getAbsolutePath());
 			}
-			Java18MergeParser parser = new Java18MergeParser(new OffsetCharStream(new InputStreamReader(new FileInputStream(javaFile),"UTF8")));
+			Html5MergeParser parser = new Html5MergeParser(new OffsetCharStream(new InputStreamReader(new FileInputStream(javaFile),"UTF8")));
 			parser.CompilationUnit(false);
 			generatedAst.addChild(new FSTNonTerminal("Java-File", javaFile.getName()));
 			generatedAst.addChild(parser.getRoot());
@@ -66,7 +66,20 @@ public class JParser {
 			return false;
 		}
 	}
-	
+
+	private boolean isValidHtmlFile(File file) throws FileNotFoundException, ParseException
+	{
+		if(FilesManager.readFileContent(file).isEmpty()){
+			throw new FileNotFoundException();
+		} else if(file != null && (isHtmlFile(file) || JFSTMerge.isGit)){
+			return true;
+		} else if(file != null && !isHtmlFile(file)){
+			throw new ParseException("The file " + file.getName() + " is not a valid .html file.");
+		} else {
+			return false;
+		}
+	}
+
 
 	/**
 	 * Checks if a given file is a .java file.
@@ -76,5 +89,9 @@ public class JParser {
 	private boolean isJavaFile(File file){
 		//return FilenameUtils.getExtension(file.getAbsolutePath()).equalsIgnoreCase("java");
 		return file.getName().toLowerCase().contains(".java");
+	}
+
+	private boolean isHtmlFile(File file) {
+		return file.getName().toLowerCase().contains(".html");
 	}
 }

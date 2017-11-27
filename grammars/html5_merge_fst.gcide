@@ -128,71 +128,157 @@ TOKEN: {
 GRAMMARSTART
 
 @FSTNonTerminal()
-Document:
+CompilationUnit:
     (Element)*
 ;
 
-@FSTNonTerminal()
 Element:
+
+    @FSTNonTerminal()
     TagBlock |
+
+    @FSTNonTerminal(name="{Comment}")
     Comment |
+
+    @FSTNonTerminal(name="{Cdata}")
     Cdata |
+
+    @FSTNonTerminal(name="{Dtd}")
     Dtd |
+
+    @FSTNonTerminal(name="{Xml}")
     Xml |
-    Sc_let1 |
-    Sc_let2 |
-    Script |
-    Style |
+
+    @FSTNonTerminal(name="{Sclet}")
+    Sclet |
+
+    @FSTNonTerminal(name="{CharData}")
     CharData
 ;
 
-@FSTNonTerminal()
+
 TagBlock:
-    LL(2147483647) <TO> <ID> (Attribute)* <TC> (LL(2) Element)* <TO> <TS> <ID> <TC> |
-    LL(2147483647) <TO> <ID> (Attribute)* <TS> <TC> |
-    LL(2147483647) <TO> <E_ID> (Attribute)* <TS> <TC> |
-    LL(2147483647) <TO> <E_ID> (Attribute)* <TC>
+
+    @FSTNonTerminal(name="{TagOpen}")
+    LL(2147483647) TagOpen (LL(2) Element)* TagClose |
+
+    @FSTNonTerminal(name="{TagOpenClose}")
+    LL(2147483647)  TagOpenClose |
+
+    @FSTNonTerminal(name="{EmptyTag}")
+    LL(2147483647) EmptyTag |
+
+    @FSTNonTerminal(name="{EmptyCloseTag}")
+    LL(2147483647) EmptyCloseTag
 ;
 
+@FSTNonTerminal(name="tag->{Id}{AttributeList}")
+TagOpen:
+    To Id (AttributeList)? Tc
+;
+@FSTTerminal()
+TagClose:
+    To Ts Id Tc
+;
+
+@FSTNonTerminal(name="ctag->{Id}{AttributeList}")
+@FSTNonTerminal()
+TagOpenClose:
+    To Id (AttributeList)? Ts Tc
+;
+
+@FSTNonTerminal(name="etag->{EId}")
+EmptyTag:
+    To EId (AttributeList)? Tc
+;
+
+@FSTNonTerminal(name="ectag->{EId}{AttributeList}")
+EmptyCloseTag:
+    To EId (AttributeList)? Ts Tc
+;
+
+@FSTExportName("{TOSTRING}")
+Comment:
+    <COMMENT_TO> (<COMMENT>)? <COMMENT_TC>
+;
+
+@FSTExportName("{TOSTRING}")
+Cdata:
+    <CDATA_TO> (<CDATA>)? <CDATA_TC>
+;
+
+@FSTExportName("{TOSTRING}")
+Dtd:
+    <DTD_TO> (<DTD>)? <DTD_TC>
+;
+
+@FSTExportName("{TOSTRING}")
+Xml:
+    <XML_TO> (<XML>)? <XML_TC>
+;
+
+@FSTExportName("{TOSTRING}")
+Sclet:
+    Sclet1 | Sclet2
+;
+Sclet1:
+    <SC_LET1_TO> (<SC_LET1>)? <SC_LET1_TC>
+;
+Sclet2:
+    <SC_LET2_TO> (<SC_LET2>)? <SC_LET2_TC>
+;
+
+@FSTExportName("ws->{AUTO}")
 CharData:
     (LL(2) Text)+
 ;
 
+@FSTTerminal(merge="LineBased")
 Text:
     <TEXT> |
     <WS>
 ;
 
-@FSTNonTerminal(name="{TOSTRING}")
-Comment:
-    <COMMENT_TO> (<COMMENT>)? <COMMENT_TC>
-;
-Cdata:
-    <CDATA_TO> (<CDATA>)? <CDATA_TC>
-;
-Dtd:
-    <DTD_TO> (<DTD>)? <DTD_TC>
-;
-Xml:
-    <XML_TO> (<XML>)? <XML_TC>
-;
-Sc_let:
-    Sc_let1 | Sc_let2
-;
-Sc_let1:
-    <SC_LET1_TO> (<SC_LET1>)? <SC_LET1_TC>
-;
-Sc_let2:
-    <SC_LET2_TO> (<SC_LET2>)? <SC_LET2_TC>
-;
+@FSTNonTerminal(name="script->{AUTO}")
 Script:
-    <SCRIPT_TO> (<SCRIPT>)? <SCRIPT_TC>
+    ScriptTo (AttributeList)? (ScriptContent)? ScriptTc
 ;
+
+@FSTNonTerminal(name="style->{AUTO}")
 Style:
-    <STYLE_TO> (<STYLE>)? <STYLE_TC>
+    StyleTo (AttributeList)? (StyleConent)? StyleTc
+;
+
+@FSTNonTerminal()
+AttributeList:
+    (Attribute)+
 ;
 
 Attribute:
-    LL(2) <ID> <ASSIGN> <ATTR_VALUE> |
-    LL(2) <ID>
+
+    @FSTNonTerminal(name="{Id}")
+    LL(2) Id Assign AttrValue |
+
+    @FSTNonTerminal(name="{Id}")
+    LL(2) Id
 ;
+
+@FSTTerminal(name="{TOSTRING}", merge="LineBased")
+Id: <ID>;
+@FSTTerminal(name="{TOSTRING}", merge="LineBased")
+EId: <E_ID>;
+@FSTTerminal(merge="LineBased")
+AttrValue: <ATTR_VALUE>;
+Assign: <ASSIGN>;
+
+To: <TO>;
+Tc: <TC>;
+Ts: <TS>;
+
+ScriptTo: <SCRIPT_TO>;
+ScriptTc: <SCRIPT_TC>;
+ScriptContent: <SCRIPT>;
+
+StyleTo: <STYLE_TO>;
+StyleTc: <STYLE_TC>;
+StyleConent: <STYLE>;
