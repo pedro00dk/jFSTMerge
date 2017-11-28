@@ -104,7 +104,7 @@ TOKEN: {
 <   TS          : "/"                                                                               > |
 <   E_ID        : ("area" | "base" | "br" | "col" | "hr" | "img" | "input" | "link" | "meta" | "param" | "command" | "keygen" | "source") > |
 <   ID          : <ID_FIRST> (<ID_REST>)*                                                           > |
-<   #ID_FIRST   : ["A"-"Z", "a"-"z", "\u2070"-"\u218F", "\u2C00"-"\u2FEF", "\u3001"-"\uD7FF", "\uF900"-"\uFDCF", "\uFDF0"-"\uFFFD"] > |
+<   #ID_FIRST   : ["(", ")", "[", "]", "*", "A"-"Z", "a"-"z", "\u2070"-"\u218F", "\u2C00"-"\u2FEF", "\u3001"-"\uD7FF", "\uF900"-"\uFDCF", "\uFDF0"-"\uFFFD"] > |
 <   #ID_REST    :  <ID_FIRST> | ["0"-"9", "-", "_", ".", "\u00B7", "\u0300"-"\u036F", "\u203F"-"\u2040"] > |
 <   ASSIGN      : "="                                                                               > : IN_ATTR
 }
@@ -134,8 +134,17 @@ CompilationUnit:
 
 Element:
 
-    @FSTNonTerminal()
-    TagBlock |
+    @FSTNonTerminal(name="{TagOpen}")
+    LL(2147483647) TagOpen (LL(2) Element)* TagClose |
+
+    @FSTNonTerminal(name="{TagOpenClose}")
+    LL(2147483647)  TagOpenClose |
+
+    @FSTNonTerminal(name="{EmptyTag}")
+    LL(2147483647) EmptyTag |
+
+    @FSTNonTerminal(name="{EmptyCloseTag}")
+    LL(2147483647) EmptyCloseTag |
 
     @FSTNonTerminal(name="{Comment}")
     Comment |
@@ -156,23 +165,7 @@ Element:
     CharData
 ;
 
-
-TagBlock:
-
-    @FSTNonTerminal(name="{TagOpen}")
-    LL(2147483647) TagOpen (LL(2) Element)* TagClose |
-
-    @FSTNonTerminal(name="{TagOpenClose}")
-    LL(2147483647)  TagOpenClose |
-
-    @FSTNonTerminal(name="{EmptyTag}")
-    LL(2147483647) EmptyTag |
-
-    @FSTNonTerminal(name="{EmptyCloseTag}")
-    LL(2147483647) EmptyCloseTag
-;
-
-@FSTNonTerminal(name="tag->{Id}{AttributeList}")
+@FSTNonTerminal(name="tag->{Id}")
 TagOpen:
     To Id (AttributeList)? Tc
 ;
@@ -181,7 +174,7 @@ TagClose:
     To Ts Id Tc
 ;
 
-@FSTNonTerminal(name="ctag->{Id}{AttributeList}")
+@FSTNonTerminal(name="ctag->{Id}")
 @FSTNonTerminal()
 TagOpenClose:
     To Id (AttributeList)? Ts Tc
@@ -192,7 +185,7 @@ EmptyTag:
     To EId (AttributeList)? Tc
 ;
 
-@FSTNonTerminal(name="ectag->{EId}{AttributeList}")
+@FSTNonTerminal(name="ectag->{EId}")
 EmptyCloseTag:
     To EId (AttributeList)? Ts Tc
 ;
@@ -228,9 +221,9 @@ Sclet2:
     <SC_LET2_TO> (<SC_LET2>)? <SC_LET2_TC>
 ;
 
-@FSTExportName("ws->{AUTO}")
+@FSTExportName("{AUTO}")
 CharData:
-    (LL(2) Text)+
+    &LI Text (LL(2) &LI Text)*
 ;
 
 @FSTTerminal(merge="LineBased")
@@ -251,7 +244,7 @@ Style:
 
 @FSTNonTerminal()
 AttributeList:
-    (Attribute)+
+    &LI Attribute (&LI Attribute)*
 ;
 
 Attribute:

@@ -223,7 +223,14 @@ public class JFSTMerge {
 
             System.out.println("/////////////////////////////////");
             System.out.println("Testing: " + pathName);
-            new JFSTMerge().mergeFiles(left, base, right, null);
+            try {
+                new JFSTMerge().mergeFiles(left, base, right, null);
+            } catch (Exception e) {
+                e.printStackTrace();
+                e.printStackTrace();
+                System.out.println("\n");
+                System.out.println("Merge failed");
+            }
             System.out.print("\n\n");
         }
     }

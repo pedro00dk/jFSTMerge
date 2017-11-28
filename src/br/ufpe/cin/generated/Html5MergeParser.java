@@ -41,61 +41,6 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
   final public FSTInfo Element(boolean inTerminal) throws ParseException {
                                         Token first=null,t;FSTInfo n;
      first=getToken(1); productionStart(inTerminal);
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case TO:
-      n = TagBlock(inTerminal);
-                                replaceName(n);
-                                                  {if (true) return productionEndNonTerminal("Element1","-","-");}
-      break;
-    case COMMENT_TO:
-      n = Comment(inTerminal);
-                               replaceName("Comment", n);
-                                                            replaceName(n);
-                                                                              {if (true) return productionEndNonTerminal("Element2","{Comment}","{Comment}");}
-      break;
-    case CDATA_TO:
-      n = Cdata(inTerminal);
-                             replaceName("Cdata", n);
-                                                        replaceName(n);
-                                                                          {if (true) return productionEndNonTerminal("Element3","{Cdata}","{Cdata}");}
-      break;
-    case DTD_TO:
-      n = Dtd(inTerminal);
-                           replaceName("Dtd", n);
-                                                    replaceName(n);
-                                                                      {if (true) return productionEndNonTerminal("Element4","{Dtd}","{Dtd}");}
-      break;
-    case XML_TO:
-      n = Xml(inTerminal);
-                           replaceName("Xml", n);
-                                                    replaceName(n);
-                                                                      {if (true) return productionEndNonTerminal("Element5","{Xml}","{Xml}");}
-      break;
-    case SC_LET1_TO:
-    case SC_LET2_TO:
-      n = Sclet(inTerminal);
-                             replaceName("Sclet", n);
-                                                        replaceName(n);
-                                                                          {if (true) return productionEndNonTerminal("Element6","{Sclet}","{Sclet}");}
-      break;
-    case WS:
-    case TEXT:
-      n = CharData(inTerminal);
-                                replaceName("CharData", n);
-                                                              replaceName(n);
-                                                                                {if (true) return productionEndNonTerminal("Element7","{CharData}","{CharData}");}
-      break;
-    default:
-      jj_la1[1] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-    throw new Error("Missing return statement in function");
-  }
-
-  final public FSTInfo TagBlock(boolean inTerminal) throws ParseException {
-                                         Token first=null,t;FSTInfo n;
-     first=getToken(1); productionStart(inTerminal);
     if (jj_2_2(2147483647)) {
       n = TagOpen(inTerminal);
                                                      replaceName("TagOpen", n);
@@ -112,25 +57,67 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
       }
       n = TagClose(inTerminal);
                                                                                                                                                                                    replaceName(n);
-                                                                                                                                                                                                     {if (true) return productionEndNonTerminal("TagBlock1","{TagOpen}","{TagOpen}");}
+                                                                                                                                                                                                     {if (true) return productionEndNonTerminal("Element1","{TagOpen}","{TagOpen}");}
     } else if (jj_2_3(2147483647)) {
       n = TagOpenClose(inTerminal);
                                                           replaceName("TagOpenClose", n);
                                                                                             replaceName(n);
-                                                                                                              {if (true) return productionEndNonTerminal("TagBlock2","{TagOpenClose}","{TagOpenClose}");}
+                                                                                                              {if (true) return productionEndNonTerminal("Element2","{TagOpenClose}","{TagOpenClose}");}
     } else if (jj_2_4(2147483647)) {
       n = EmptyTag(inTerminal);
                                                       replaceName("EmptyTag", n);
                                                                                     replaceName(n);
-                                                                                                      {if (true) return productionEndNonTerminal("TagBlock3","{EmptyTag}","{EmptyTag}");}
+                                                                                                      {if (true) return productionEndNonTerminal("Element3","{EmptyTag}","{EmptyTag}");}
     } else if (jj_2_5(2147483647)) {
       n = EmptyCloseTag(inTerminal);
                                                            replaceName("EmptyCloseTag", n);
                                                                                               replaceName(n);
-                                                                                                                {if (true) return productionEndNonTerminal("TagBlock4","{EmptyCloseTag}","{EmptyCloseTag}");}
+                                                                                                                {if (true) return productionEndNonTerminal("Element4","{EmptyCloseTag}","{EmptyCloseTag}");}
     } else {
-      jj_consume_token(-1);
-      throw new ParseException();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMENT_TO:
+        n = Comment(inTerminal);
+                               replaceName("Comment", n);
+                                                            replaceName(n);
+                                                                              {if (true) return productionEndNonTerminal("Element5","{Comment}","{Comment}");}
+        break;
+      case CDATA_TO:
+        n = Cdata(inTerminal);
+                             replaceName("Cdata", n);
+                                                        replaceName(n);
+                                                                          {if (true) return productionEndNonTerminal("Element6","{Cdata}","{Cdata}");}
+        break;
+      case DTD_TO:
+        n = Dtd(inTerminal);
+                           replaceName("Dtd", n);
+                                                    replaceName(n);
+                                                                      {if (true) return productionEndNonTerminal("Element7","{Dtd}","{Dtd}");}
+        break;
+      case XML_TO:
+        n = Xml(inTerminal);
+                           replaceName("Xml", n);
+                                                    replaceName(n);
+                                                                      {if (true) return productionEndNonTerminal("Element8","{Xml}","{Xml}");}
+        break;
+      case SC_LET1_TO:
+      case SC_LET2_TO:
+        n = Sclet(inTerminal);
+                             replaceName("Sclet", n);
+                                                        replaceName(n);
+                                                                          {if (true) return productionEndNonTerminal("Element9","{Sclet}","{Sclet}");}
+        break;
+      case WS:
+      case TEXT:
+        n = CharData(inTerminal);
+                                replaceName("CharData", n);
+                                                              replaceName(n);
+                                                                                {if (true) return productionEndNonTerminal("Element10","{CharData}","{CharData}");}
+        break;
+      default:
+        jj_la1[1] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
     }
     throw new Error("Missing return statement in function");
   }
@@ -146,16 +133,15 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ID:
       n = AttributeList(inTerminal);
-                                                                                                                                    replaceName("AttributeList", n);
-                                                                                                                                                                       replaceName(n);
+                                                                                                                                    replaceName(n);
       break;
     default:
       jj_la1[2] = jj_gen;
       ;
     }
     n = Tc(inTerminal);
-                                                                                                                                                                                                           replaceName(n);
-                                                                                                                                                                                                                             {if (true) return productionEndNonTerminal("TagOpen","tag->{Id}{AttributeList}","tag->{Id}{AttributeList}");}
+                                                                                                                                                                        replaceName(n);
+                                                                                                                                                                                          {if (true) return productionEndNonTerminal("TagOpen","tag->{Id}","tag->{Id}");}
     throw new Error("Missing return statement in function");
   }
 
@@ -185,18 +171,17 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ID:
       n = AttributeList(inTerminal);
-                                                                                                                                    replaceName("AttributeList", n);
-                                                                                                                                                                       replaceName(n);
+                                                                                                                                    replaceName(n);
       break;
     default:
       jj_la1[3] = jj_gen;
       ;
     }
     n = Ts(inTerminal);
-                                                                                                                                                                                                           replaceName(n);
+                                                                                                                                                                        replaceName(n);
     n = Tc(inTerminal);
-                                                                                                                                                                                                                                              replaceName(n);
-                                                                                                                                                                                                                                                                {if (true) return productionEndNonTerminal("TagOpenClose","ctag->{Id}{AttributeList}","ctag->{Id}{AttributeList}");}
+                                                                                                                                                                                                           replaceName(n);
+                                                                                                                                                                                                                             {if (true) return productionEndNonTerminal("TagOpenClose","ctag->{Id}","ctag->{Id}");}
     throw new Error("Missing return statement in function");
   }
 
@@ -234,18 +219,17 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ID:
       n = AttributeList(inTerminal);
-                                                                                                                                      replaceName("AttributeList", n);
-                                                                                                                                                                         replaceName(n);
+                                                                                                                                      replaceName(n);
       break;
     default:
       jj_la1[5] = jj_gen;
       ;
     }
     n = Ts(inTerminal);
-                                                                                                                                                                                                             replaceName(n);
+                                                                                                                                                                          replaceName(n);
     n = Tc(inTerminal);
-                                                                                                                                                                                                                                                replaceName(n);
-                                                                                                                                                                                                                                                                  {if (true) return productionEndNonTerminal("EmptyCloseTag","ectag->{EId}{AttributeList}","ectag->{EId}{AttributeList}");}
+                                                                                                                                                                                                             replaceName(n);
+                                                                                                                                                                                                                               {if (true) return productionEndNonTerminal("EmptyCloseTag","ectag->{EId}","ectag->{EId}");}
     throw new Error("Missing return statement in function");
   }
 
@@ -376,17 +360,19 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
   final public FSTInfo CharData(boolean inTerminal) throws ParseException {
                                          Token first=null,t;FSTInfo n;
      first=getToken(1); productionStart(inTerminal);
+    n = Text(true);
+                      replaceName(n);
     label_3:
     while (true) {
-      n = Text(true);
-                                    replaceName(n);
       if (jj_2_6(2)) {
         ;
       } else {
         break label_3;
       }
+      n = Text(true);
+                                                                   replaceName(n);
     }
-                                                        {if (true) return productionEndTerminal("CharData","-","ws->{AUTO}","Replacement","Default",first,token);}
+                                                                                       {if (true) return productionEndTerminal("CharData","-","{AUTO}","Replacement","Default",first,token);}
     throw new Error("Missing return statement in function");
   }
 
@@ -471,10 +457,10 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
   final public FSTInfo AttributeList(boolean inTerminal) throws ParseException {
                                               Token first=null,t;FSTInfo n;
      first=getToken(1); productionStart(inTerminal);
+    n = Attribute(inTerminal);
+                                 replaceName(n);
     label_4:
     while (true) {
-      n = Attribute(inTerminal);
-                                  replaceName(n);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ID:
         ;
@@ -483,8 +469,10 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
         jj_la1[18] = jj_gen;
         break label_4;
       }
+      n = Attribute(inTerminal);
+                                                                            replaceName(n);
     }
-                                                      {if (true) return productionEndNonTerminal("AttributeList","-","-");}
+                                                                                                {if (true) return productionEndNonTerminal("AttributeList","-","-");}
     throw new Error("Missing return statement in function");
   }
 
@@ -672,8 +660,39 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     finally { jj_save(7, xla); }
   }
 
+  final private boolean jj_3R_25() {
+    if (jj_scan_token(E_ID)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_26() {
+    if (jj_3R_36()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_10() {
+    if (jj_3R_20()) return true;
+    if (jj_3R_25()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_27()) jj_scanpos = xsp;
+    if (jj_3R_23()) return true;
+    if (jj_3R_22()) return true;
+    return false;
+  }
+
   final private boolean jj_3R_12() {
     if (jj_scan_token(ID)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_9() {
+    if (jj_3R_20()) return true;
+    if (jj_3R_25()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_26()) jj_scanpos = xsp;
+    if (jj_3R_22()) return true;
     return false;
   }
 
@@ -682,40 +701,35 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_9() {
-    if (jj_3R_21()) return true;
-    if (jj_3R_26()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_27()) jj_scanpos = xsp;
-    if (jj_3R_23()) return true;
+  final private boolean jj_3R_24() {
+    if (jj_3R_36()) return true;
     return false;
   }
 
-  final private boolean jj_3R_25() {
-    if (jj_3R_38()) return true;
+  final private boolean jj_3_6() {
+    if (jj_3R_11()) return true;
     return false;
   }
 
   final private boolean jj_3_7() {
     if (jj_3R_12()) return true;
     if (jj_3R_13()) return true;
-    if (jj_3R_45()) return true;
+    if (jj_3R_43()) return true;
     return false;
   }
 
   final private boolean jj_3R_8() {
-    if (jj_3R_21()) return true;
+    if (jj_3R_20()) return true;
     if (jj_3R_12()) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_25()) jj_scanpos = xsp;
-    if (jj_3R_24()) return true;
+    if (jj_3R_24()) jj_scanpos = xsp;
     if (jj_3R_23()) return true;
+    if (jj_3R_22()) return true;
     return false;
   }
 
-  final private boolean jj_3R_44() {
+  final private boolean jj_3R_39() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_7()) {
@@ -725,41 +739,76 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_41() {
-    if (jj_3R_44()) return true;
-    return false;
-  }
-
   final private boolean jj_3R_7() {
-    if (jj_3R_21()) return true;
-    if (jj_3R_24()) return true;
-    if (jj_3R_12()) return true;
+    if (jj_3R_20()) return true;
     if (jj_3R_23()) return true;
+    if (jj_3R_12()) return true;
+    if (jj_3R_22()) return true;
     return false;
   }
 
-  final private boolean jj_3R_38() {
+  final private boolean jj_3R_36() {
+    if (jj_3R_39()) return true;
     Token xsp;
-    if (jj_3R_41()) return true;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3R_41()) { jj_scanpos = xsp; break; }
+      if (jj_3R_40()) { jj_scanpos = xsp; break; }
     }
     return false;
   }
 
-  final private boolean jj_3R_22() {
-    if (jj_3R_38()) return true;
+  final private boolean jj_3R_21() {
+    if (jj_3R_36()) return true;
     return false;
   }
 
   final private boolean jj_3R_6() {
-    if (jj_3R_21()) return true;
+    if (jj_3R_20()) return true;
     if (jj_3R_12()) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_22()) jj_scanpos = xsp;
-    if (jj_3R_23()) return true;
+    if (jj_3R_21()) jj_scanpos = xsp;
+    if (jj_3R_22()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_19() {
+    if (jj_3R_35()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_18() {
+    if (jj_3R_34()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_17() {
+    if (jj_3R_33()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_16() {
+    if (jj_3R_32()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_29() {
+    if (jj_scan_token(WS)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_15() {
+    if (jj_3R_31()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_28() {
+    if (jj_scan_token(TEXT)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_14() {
+    if (jj_3R_30()) return true;
     return false;
   }
 
@@ -770,6 +819,16 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
 
   final private boolean jj_3_4() {
     if (jj_3R_9()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_11() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_28()) {
+    jj_scanpos = xsp;
+    if (jj_3R_29()) return true;
+    }
     return false;
   }
 
@@ -789,8 +848,13 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_30() {
-    if (jj_scan_token(WS)) return true;
+  final private boolean jj_3R_35() {
+    if (jj_3R_11()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_6()) { jj_scanpos = xsp; break; }
+    }
     return false;
   }
 
@@ -799,12 +863,7 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_29() {
-    if (jj_scan_token(TEXT)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_31() {
+  final private boolean jj_3R_5() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_2()) {
@@ -813,85 +872,8 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     jj_scanpos = xsp;
     if (jj_3_4()) {
     jj_scanpos = xsp;
-    if (jj_3_5()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  final private boolean jj_3R_20() {
-    if (jj_3R_37()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_19() {
-    if (jj_3R_36()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_11() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_29()) {
+    if (jj_3_5()) {
     jj_scanpos = xsp;
-    if (jj_3R_30()) return true;
-    }
-    return false;
-  }
-
-  final private boolean jj_3_6() {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_18() {
-    if (jj_3R_35()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_17() {
-    if (jj_3R_34()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_37() {
-    Token xsp;
-    if (jj_3_6()) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_6()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  final private boolean jj_3R_16() {
-    if (jj_3R_33()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_15() {
-    if (jj_3R_32()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_14() {
-    if (jj_3R_31()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_43() {
-    if (jj_scan_token(SC_LET2_TO)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(22)) jj_scanpos = xsp;
-    if (jj_scan_token(SC_LET2_TC)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_5() {
-    Token xsp;
-    xsp = jj_scanpos;
     if (jj_3R_14()) {
     jj_scanpos = xsp;
     if (jj_3R_15()) {
@@ -902,9 +884,10 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     jj_scanpos = xsp;
     if (jj_3R_18()) {
     jj_scanpos = xsp;
-    if (jj_3R_19()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
+    if (jj_3R_19()) return true;
+    }
+    }
+    }
     }
     }
     }
@@ -915,6 +898,15 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
   }
 
   final private boolean jj_3R_42() {
+    if (jj_scan_token(SC_LET2_TO)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(22)) jj_scanpos = xsp;
+    if (jj_scan_token(SC_LET2_TC)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_41() {
     if (jj_scan_token(SC_LET1_TO)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -923,37 +915,42 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_40() {
-    if (jj_3R_43()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_39() {
+  final private boolean jj_3R_38() {
     if (jj_3R_42()) return true;
     return false;
   }
 
-  final private boolean jj_3R_24() {
-    if (jj_scan_token(TS)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_36() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_39()) {
-    jj_scanpos = xsp;
-    if (jj_3R_40()) return true;
-    }
+  final private boolean jj_3R_37() {
+    if (jj_3R_41()) return true;
     return false;
   }
 
   final private boolean jj_3R_23() {
+    if (jj_scan_token(TS)) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_34() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_37()) {
+    jj_scanpos = xsp;
+    if (jj_3R_38()) return true;
+    }
+    return false;
+  }
+
+  final private boolean jj_3R_40() {
+    if (jj_3R_39()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_22() {
     if (jj_scan_token(TC)) return true;
     return false;
   }
 
-  final private boolean jj_3R_35() {
+  final private boolean jj_3R_33() {
     if (jj_scan_token(XML_TO)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -962,12 +959,12 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_21() {
+  final private boolean jj_3R_20() {
     if (jj_scan_token(TO)) return true;
     return false;
   }
 
-  final private boolean jj_3R_34() {
+  final private boolean jj_3R_32() {
     if (jj_scan_token(DTD_TO)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -981,7 +978,7 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_33() {
+  final private boolean jj_3R_31() {
     if (jj_scan_token(CDATA_TO)) return true;
     Token xsp;
     xsp = jj_scanpos;
@@ -990,43 +987,22 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
     return false;
   }
 
-  final private boolean jj_3R_45() {
+  final private boolean jj_3R_43() {
     if (jj_scan_token(ATTR_VALUE)) return true;
     return false;
   }
 
-  final private boolean jj_3R_28() {
-    if (jj_3R_38()) return true;
+  final private boolean jj_3R_27() {
+    if (jj_3R_36()) return true;
     return false;
   }
 
-  final private boolean jj_3R_32() {
+  final private boolean jj_3R_30() {
     if (jj_scan_token(COMMENT_TO)) return true;
     Token xsp;
     xsp = jj_scanpos;
     if (jj_scan_token(12)) jj_scanpos = xsp;
     if (jj_scan_token(COMMENT_TC)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_26() {
-    if (jj_scan_token(E_ID)) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_27() {
-    if (jj_3R_38()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_10() {
-    if (jj_3R_21()) return true;
-    if (jj_3R_26()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_28()) jj_scanpos = xsp;
-    if (jj_3R_24()) return true;
-    if (jj_3R_23()) return true;
     return false;
   }
 
@@ -1046,7 +1022,7 @@ public class Html5MergeParser extends AbstractFSTParser implements Html5MergePar
       jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x4fe,0x4fe,0x80000000,0x80000000,0x80000000,0x80000000,0x1000,0x4000,0x10000,0x40000,0xc0,0x100000,0x400000,0x2,0x80000000,0x1000000,0x80000000,0x4000000,0x80000000,};
+      jj_la1_0 = new int[] {0x4fe,0xfe,0x80000000,0x80000000,0x80000000,0x80000000,0x1000,0x4000,0x10000,0x40000,0xc0,0x100000,0x400000,0x2,0x80000000,0x1000000,0x80000000,0x4000000,0x80000000,};
    }
    private static void jj_la1_1() {
       jj_la1_1 = new int[] {0x200,0x200,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x200,0x0,0x0,0x0,0x0,0x0,};

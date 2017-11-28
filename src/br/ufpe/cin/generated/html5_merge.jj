@@ -104,7 +104,7 @@ TOKEN: {
 <   TS          : "/"                                                                               > |
 <   E_ID        : ("area" | "base" | "br" | "col" | "hr" | "img" | "input" | "link" | "meta" | "param" | "command" | "keygen" | "source") > |
 <   ID          : <ID_FIRST> (<ID_REST>)*                                                           > |
-<   #ID_FIRST   : ["A"-"Z", "a"-"z", "\u2070"-"\u218F", "\u2C00"-"\u2FEF", "\u3001"-"\uD7FF", "\uF900"-"\uFDCF", "\uFDF0"-"\uFFFD"] > |
+<   #ID_FIRST   : ["(", ")", "[", "]", "*", "A"-"Z", "a"-"z", "\u2070"-"\u218F", "\u2C00"-"\u2FEF", "\u3001"-"\uD7FF", "\uF900"-"\uFDCF", "\uFDF0"-"\uFFFD"] > |
 <   #ID_REST    :  <ID_FIRST> | ["0"-"9", "-", "_", ".", "\u00B7", "\u0300"-"\u036F", "\u203F"-"\u2040"] > |
 <   ASSIGN      : "="                                                                               > : IN_ATTR
 }
@@ -132,37 +132,31 @@ FSTInfo CompilationUnit(boolean inTerminal) : { Token first=null,t;FSTInfo n;
 
 FSTInfo Element(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
 } { {first=getToken(1); productionStart(inTerminal); } (
-	n=TagBlock(inTerminal){ replaceName(n);} {return productionEndNonTerminal("Element1","-","-");}
+	LOOKAHEAD(2147483647) n=TagOpen(inTerminal){ replaceName("TagOpen", n);}{ replaceName(n);} (LOOKAHEAD(2) n=Element(inTerminal){ replaceName(n);})* n=TagClose(inTerminal){ replaceName(n);} {return productionEndNonTerminal("Element1","{TagOpen}","{TagOpen}");}
  |
-	n=Comment(inTerminal){ replaceName("Comment", n);}{ replaceName(n);} {return productionEndNonTerminal("Element2","{Comment}","{Comment}");}
+	LOOKAHEAD(2147483647) n=TagOpenClose(inTerminal){ replaceName("TagOpenClose", n);}{ replaceName(n);} {return productionEndNonTerminal("Element2","{TagOpenClose}","{TagOpenClose}");}
  |
-	n=Cdata(inTerminal){ replaceName("Cdata", n);}{ replaceName(n);} {return productionEndNonTerminal("Element3","{Cdata}","{Cdata}");}
+	LOOKAHEAD(2147483647) n=EmptyTag(inTerminal){ replaceName("EmptyTag", n);}{ replaceName(n);} {return productionEndNonTerminal("Element3","{EmptyTag}","{EmptyTag}");}
  |
-	n=Dtd(inTerminal){ replaceName("Dtd", n);}{ replaceName(n);} {return productionEndNonTerminal("Element4","{Dtd}","{Dtd}");}
+	LOOKAHEAD(2147483647) n=EmptyCloseTag(inTerminal){ replaceName("EmptyCloseTag", n);}{ replaceName(n);} {return productionEndNonTerminal("Element4","{EmptyCloseTag}","{EmptyCloseTag}");}
  |
-	n=Xml(inTerminal){ replaceName("Xml", n);}{ replaceName(n);} {return productionEndNonTerminal("Element5","{Xml}","{Xml}");}
+	n=Comment(inTerminal){ replaceName("Comment", n);}{ replaceName(n);} {return productionEndNonTerminal("Element5","{Comment}","{Comment}");}
  |
-	n=Sclet(inTerminal){ replaceName("Sclet", n);}{ replaceName(n);} {return productionEndNonTerminal("Element6","{Sclet}","{Sclet}");}
+	n=Cdata(inTerminal){ replaceName("Cdata", n);}{ replaceName(n);} {return productionEndNonTerminal("Element6","{Cdata}","{Cdata}");}
  |
-	n=CharData(inTerminal){ replaceName("CharData", n);}{ replaceName(n);} {return productionEndNonTerminal("Element7","{CharData}","{CharData}");}
-
- )  }
-
-FSTInfo TagBlock(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
-} { {first=getToken(1); productionStart(inTerminal); } (
-	LOOKAHEAD(2147483647) n=TagOpen(inTerminal){ replaceName("TagOpen", n);}{ replaceName(n);} (LOOKAHEAD(2) n=Element(inTerminal){ replaceName(n);})* n=TagClose(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagBlock1","{TagOpen}","{TagOpen}");}
+	n=Dtd(inTerminal){ replaceName("Dtd", n);}{ replaceName(n);} {return productionEndNonTerminal("Element7","{Dtd}","{Dtd}");}
  |
-	LOOKAHEAD(2147483647) n=TagOpenClose(inTerminal){ replaceName("TagOpenClose", n);}{ replaceName(n);} {return productionEndNonTerminal("TagBlock2","{TagOpenClose}","{TagOpenClose}");}
+	n=Xml(inTerminal){ replaceName("Xml", n);}{ replaceName(n);} {return productionEndNonTerminal("Element8","{Xml}","{Xml}");}
  |
-	LOOKAHEAD(2147483647) n=EmptyTag(inTerminal){ replaceName("EmptyTag", n);}{ replaceName(n);} {return productionEndNonTerminal("TagBlock3","{EmptyTag}","{EmptyTag}");}
+	n=Sclet(inTerminal){ replaceName("Sclet", n);}{ replaceName(n);} {return productionEndNonTerminal("Element9","{Sclet}","{Sclet}");}
  |
-	LOOKAHEAD(2147483647) n=EmptyCloseTag(inTerminal){ replaceName("EmptyCloseTag", n);}{ replaceName(n);} {return productionEndNonTerminal("TagBlock4","{EmptyCloseTag}","{EmptyCloseTag}");}
+	n=CharData(inTerminal){ replaceName("CharData", n);}{ replaceName(n);} {return productionEndNonTerminal("Element10","{CharData}","{CharData}");}
 
  )  }
 
 FSTInfo TagOpen(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
 } { {first=getToken(1); productionStart(inTerminal); } (
-	n=To(inTerminal){ replaceName(n);} n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName("AttributeList", n);}{ replaceName(n);}] n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagOpen","tag->{Id}{AttributeList}","tag->{Id}{AttributeList}");}
+	n=To(inTerminal){ replaceName(n);} n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName(n);}] n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagOpen","tag->{Id}","tag->{Id}");}
 
  )  }
 
@@ -174,7 +168,7 @@ FSTInfo TagClose(boolean inTerminal) : { Token first=null,t;FSTInfo n;
 
 FSTInfo TagOpenClose(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
 } { {first=getToken(1); productionStart(inTerminal); } (
-	n=To(inTerminal){ replaceName(n);} n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName("AttributeList", n);}{ replaceName(n);}] n=Ts(inTerminal){ replaceName(n);} n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagOpenClose","ctag->{Id}{AttributeList}","ctag->{Id}{AttributeList}");}
+	n=To(inTerminal){ replaceName(n);} n=Id(inTerminal){ replaceName("Id", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName(n);}] n=Ts(inTerminal){ replaceName(n);} n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("TagOpenClose","ctag->{Id}","ctag->{Id}");}
 
  )  }
 
@@ -186,7 +180,7 @@ FSTInfo EmptyTag(boolean inTerminal) : { Token first=null,t;FSTInfo n;
 
 FSTInfo EmptyCloseTag(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
 } { {first=getToken(1); productionStart(inTerminal); } (
-	n=To(inTerminal){ replaceName(n);} n=EId(inTerminal){ replaceName("EId", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName("AttributeList", n);}{ replaceName(n);}] n=Ts(inTerminal){ replaceName(n);} n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("EmptyCloseTag","ectag->{EId}{AttributeList}","ectag->{EId}{AttributeList}");}
+	n=To(inTerminal){ replaceName(n);} n=EId(inTerminal){ replaceName("EId", n);}{ replaceName(n);} [n=AttributeList(inTerminal){ replaceName(n);}] n=Ts(inTerminal){ replaceName(n);} n=Tc(inTerminal){ replaceName(n);} {return productionEndNonTerminal("EmptyCloseTag","ectag->{EId}","ectag->{EId}");}
 
  )  }
 
@@ -236,7 +230,7 @@ FSTInfo Sclet2(boolean inTerminal) : { Token first=null,t;FSTInfo n;
 
 FSTInfo CharData(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
 } { {first=getToken(1); productionStart(inTerminal); } (
-	(LOOKAHEAD(2) n=Text(true){ replaceName(n);})+ {return productionEndTerminal("CharData","-","ws->{AUTO}","Replacement","Default",first,token);}
+	n=Text(true){ replaceName(n);} (LOOKAHEAD(2) n=Text(true){ replaceName(n);})* {return productionEndTerminal("CharData","-","{AUTO}","Replacement","Default",first,token);}
 
  )  }
 
@@ -262,7 +256,7 @@ FSTInfo Style(boolean inTerminal) : { Token first=null,t;FSTInfo n;
 
 FSTInfo AttributeList(boolean inTerminal) : { Token first=null,t;FSTInfo n; 
 } { {first=getToken(1); productionStart(inTerminal); } (
-	(n=Attribute(inTerminal){ replaceName(n);})+ {return productionEndNonTerminal("AttributeList","-","-");}
+	n=Attribute(inTerminal){ replaceName(n);} (n=Attribute(inTerminal){ replaceName(n);})* {return productionEndNonTerminal("AttributeList","-","-");}
 
  )  }
 

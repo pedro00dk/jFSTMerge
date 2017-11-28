@@ -28,83 +28,6 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 		if (nonTerminal.getType().equals("Element1")) {
 			printFeatures(nonTerminal,true);
 			{
-				FSTNode v=getChild(nonTerminal, "TagBlock");
-				if (v!=null) {
-					v.accept(this);
-				}
-			}
-			printFeatures(nonTerminal,false);
-			return false;
-		}
-		if (nonTerminal.getType().equals("Element2")) {
-			printFeatures(nonTerminal,true);
-			{
-				FSTNode v=getChild(nonTerminal, "Comment");
-				if (v!=null) {
-					v.accept(this);
-				}
-			}
-			printFeatures(nonTerminal,false);
-			return false;
-		}
-		if (nonTerminal.getType().equals("Element3")) {
-			printFeatures(nonTerminal,true);
-			{
-				FSTNode v=getChild(nonTerminal, "Cdata");
-				if (v!=null) {
-					v.accept(this);
-				}
-			}
-			printFeatures(nonTerminal,false);
-			return false;
-		}
-		if (nonTerminal.getType().equals("Element4")) {
-			printFeatures(nonTerminal,true);
-			{
-				FSTNode v=getChild(nonTerminal, "Dtd");
-				if (v!=null) {
-					v.accept(this);
-				}
-			}
-			printFeatures(nonTerminal,false);
-			return false;
-		}
-		if (nonTerminal.getType().equals("Element5")) {
-			printFeatures(nonTerminal,true);
-			{
-				FSTNode v=getChild(nonTerminal, "Xml");
-				if (v!=null) {
-					v.accept(this);
-				}
-			}
-			printFeatures(nonTerminal,false);
-			return false;
-		}
-		if (nonTerminal.getType().equals("Element6")) {
-			printFeatures(nonTerminal,true);
-			{
-				FSTNode v=getChild(nonTerminal, "Sclet");
-				if (v!=null) {
-					v.accept(this);
-				}
-			}
-			printFeatures(nonTerminal,false);
-			return false;
-		}
-		if (nonTerminal.getType().equals("Element7")) {
-			printFeatures(nonTerminal,true);
-			{
-				FSTNode v=getChild(nonTerminal, "CharData");
-				if (v!=null) {
-					v.accept(this);
-				}
-			}
-			printFeatures(nonTerminal,false);
-			return false;
-		}
-		if (nonTerminal.getType().equals("TagBlock1")) {
-			printFeatures(nonTerminal,true);
-			{
 				FSTNode v=getChild(nonTerminal, "TagOpen");
 				if (v!=null) {
 					v.accept(this);
@@ -122,7 +45,7 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 			printFeatures(nonTerminal,false);
 			return false;
 		}
-		if (nonTerminal.getType().equals("TagBlock2")) {
+		if (nonTerminal.getType().equals("Element2")) {
 			printFeatures(nonTerminal,true);
 			{
 				FSTNode v=getChild(nonTerminal, "TagOpenClose");
@@ -133,7 +56,7 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 			printFeatures(nonTerminal,false);
 			return false;
 		}
-		if (nonTerminal.getType().equals("TagBlock3")) {
+		if (nonTerminal.getType().equals("Element3")) {
 			printFeatures(nonTerminal,true);
 			{
 				FSTNode v=getChild(nonTerminal, "EmptyTag");
@@ -144,10 +67,76 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 			printFeatures(nonTerminal,false);
 			return false;
 		}
-		if (nonTerminal.getType().equals("TagBlock4")) {
+		if (nonTerminal.getType().equals("Element4")) {
 			printFeatures(nonTerminal,true);
 			{
 				FSTNode v=getChild(nonTerminal, "EmptyCloseTag");
+				if (v!=null) {
+					v.accept(this);
+				}
+			}
+			printFeatures(nonTerminal,false);
+			return false;
+		}
+		if (nonTerminal.getType().equals("Element5")) {
+			printFeatures(nonTerminal,true);
+			{
+				FSTNode v=getChild(nonTerminal, "Comment");
+				if (v!=null) {
+					v.accept(this);
+				}
+			}
+			printFeatures(nonTerminal,false);
+			return false;
+		}
+		if (nonTerminal.getType().equals("Element6")) {
+			printFeatures(nonTerminal,true);
+			{
+				FSTNode v=getChild(nonTerminal, "Cdata");
+				if (v!=null) {
+					v.accept(this);
+				}
+			}
+			printFeatures(nonTerminal,false);
+			return false;
+		}
+		if (nonTerminal.getType().equals("Element7")) {
+			printFeatures(nonTerminal,true);
+			{
+				FSTNode v=getChild(nonTerminal, "Dtd");
+				if (v!=null) {
+					v.accept(this);
+				}
+			}
+			printFeatures(nonTerminal,false);
+			return false;
+		}
+		if (nonTerminal.getType().equals("Element8")) {
+			printFeatures(nonTerminal,true);
+			{
+				FSTNode v=getChild(nonTerminal, "Xml");
+				if (v!=null) {
+					v.accept(this);
+				}
+			}
+			printFeatures(nonTerminal,false);
+			return false;
+		}
+		if (nonTerminal.getType().equals("Element9")) {
+			printFeatures(nonTerminal,true);
+			{
+				FSTNode v=getChild(nonTerminal, "Sclet");
+				if (v!=null) {
+					v.accept(this);
+				}
+			}
+			printFeatures(nonTerminal,false);
+			return false;
+		}
+		if (nonTerminal.getType().equals("Element10")) {
+			printFeatures(nonTerminal,true);
+			{
+				FSTNode v=getChild(nonTerminal, "CharData");
 				if (v!=null) {
 					v.accept(this);
 				}
@@ -343,8 +332,12 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 		}
 		if (nonTerminal.getType().equals("AttributeList")) {
 			printFeatures(nonTerminal,true);
-			for (FSTNode v : getChildren(nonTerminal,"Attribute")) {
-				v.accept(this);
+			Iterator<FSTNode> listElements = getChildren(nonTerminal, "Attribute").iterator();
+			if (listElements.hasNext()) {
+				listElements.next().accept(this);
+			}
+			while (listElements.hasNext()) {
+				listElements.next().accept(this);
 			}
 			printFeatures(nonTerminal,false);
 			return false;
@@ -397,15 +390,14 @@ public class SimplePrintVisitor extends AbstractFSTPrintVisitor  {
 		if (type.equals("Attribute2") && expectedType.equals("Attribute")) return true;
 		if (type.equals("Sclet1") && expectedType.equals("Sclet")) return true;
 		if (type.equals("Sclet2") && expectedType.equals("Sclet")) return true;
+		if (type.equals("Element9") && expectedType.equals("Element")) return true;
 		if (type.equals("Element6") && expectedType.equals("Element")) return true;
+		if (type.equals("Element10") && expectedType.equals("Element")) return true;
 		if (type.equals("Element5") && expectedType.equals("Element")) return true;
 		if (type.equals("Text2") && expectedType.equals("Text")) return true;
+		if (type.equals("Element8") && expectedType.equals("Element")) return true;
 		if (type.equals("Element7") && expectedType.equals("Element")) return true;
-		if (type.equals("TagBlock4") && expectedType.equals("TagBlock")) return true;
 		if (type.equals("Text1") && expectedType.equals("Text")) return true;
-		if (type.equals("TagBlock2") && expectedType.equals("TagBlock")) return true;
-		if (type.equals("TagBlock3") && expectedType.equals("TagBlock")) return true;
-		if (type.equals("TagBlock1") && expectedType.equals("TagBlock")) return true;
 		return false;
 	}
 }
